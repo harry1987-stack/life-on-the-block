@@ -8,12 +8,12 @@
 <h1>🎮 Jones — Original Game Launcher</h1>
 <p>Run your own copy of the <b>original 1991 game</b> in a phone-friendly browser player. This page is an emulator launcher, not a recreated game.</p>
 <div class="panel">
-<div class="row"><label class="pick" for="bundle">📁 Choose my game bundle (.jsdos)</label><input type="file" id="bundle" accept=".jsdos,application/zip"><button class="btn secondary" id="full">⛶ Fullscreen</button><button class="btn secondary" id="reset">↻ Reload</button></div>
-<p id="status" class="status" role="status">Choose a locally held .jsdos bundle to begin.</p>
+<div class="row"><label class="pick" for="bundle">📁 Choose my game bundle (.jsdos or .zip)</label><input type="file" id="bundle" ><button class="btn secondary" id="full">⛶ Fullscreen</button><button class="btn secondary" id="reset">↻ Reload</button></div>
+<p id="status" class="status" role="status">Choose the prepared .zip or .jsdos game bundle from Files to begin.</p>
 <p class="muted">Your selected game stays on your device. The game is not uploaded to this website. Internet access is required to load the js-dos emulator.</p>
 </div>
 <div class="screen" id="screen"><div id="dos"></div><div id="blank"><div><div style="font-size:64px">🕹️</div><b>Original game display</b><p>Import a .jsdos bundle to play.</p></div></div></div>
-<div class="panel tips"><b>How to use</b><p>1. Download the private .jsdos bundle prepared in this chat and save it to Files on your iPhone. 2. Tap “Choose my game bundle” above and select that file. Use the emulator’s on-screen mouse or touch controls; select fullscreen for more room.</p><p><b>Not a ROM download:</b> the original Sierra game files and artwork are not distributed here. For another route, <a href="https://www.scummvm.org/" target="_blank" rel="noopener">ScummVM</a> supports the game using your own game data.</p><p><a href="../">Back to earlier Life on the Block prototype</a></p></div>
+<div class="panel tips"><b>How to use</b><p>1. Download the prepared game bundle (prefer the .zip version on iPhone) and save it to Files. 2. Tap “Choose my game bundle” above and select it. If it is still greyed out, open the Files app and check the download location. Use the emulator’s on-screen mouse or touch controls; select fullscreen for more room.</p><p><b>Not a ROM download:</b> the original Sierra game files and artwork are not distributed here. For another route, <a href="https://www.scummvm.org/" target="_blank" rel="noopener">ScummVM</a> supports the game using your own game data.</p><p><a href="../">Back to earlier Life on the Block prototype</a></p></div>
 </main>
 <script>
 (function(){
@@ -22,7 +22,7 @@ var fileInput=document.getElementById("bundle"),status=document.getElementById("
 function say(t){status.textContent=t}
 fileInput.addEventListener("change",function(){
 var f=fileInput.files&&fileInput.files[0];if(!f)return;
-if(!/\.jsdos$/i.test(f.name)){say("Please choose a .jsdos bundle, not a plain .zip or .exe file.");return}
+if(!/\.(jsdos|zip)$/i.test(f.name)){say("Choose the .jsdos bundle or the prepared .zip bundle, not an .exe file.");return}
 if(typeof window.Dos!=="function"){say("The emulator script did not load. Check your internet connection and refresh.");return}
 try{
 if(currentUrl)URL.revokeObjectURL(currentUrl);
