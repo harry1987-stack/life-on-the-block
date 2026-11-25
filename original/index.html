@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#181b40">
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#000000"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Jones"><link rel="manifest" href="./manifest.webmanifest"><link rel="icon" href="./icon.svg" type="image/svg+xml">
 <title>Jones — Original Game Mobile Launcher</title><link rel="stylesheet" href="https://v8.js-dos.com/latest/js-dos.css">
 <style>
 *{box-sizing:border-box}body{background:#101327;color:#f7f4e1;font:16px/1.45 system-ui,sans-serif;margin:0}main{max-width:1050px;margin:auto;padding:12px;padding-bottom:calc(20px + env(safe-area-inset-bottom))}h1{margin:8px 0;font-size:clamp(23px,5vw,34px);color:#ffcf58}p{margin:8px 0}a{color:#8bd4ff}.panel{background:#222a47;border:2px solid #6c80b6;padding:12px;border-radius:12px;margin:12px 0}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.btn,.pick{font:700 16px system-ui;display:inline-block;border:2px solid #f0e6a7;background:#ffdb70;color:#17152c;padding:12px 15px;border-radius:9px;cursor:pointer;min-height:48px}.secondary{background:#b2cbef;border-color:#8eabd8}.muted{color:#bbc9e0;font-size:14px}.screen{width:100%;aspect-ratio:4/3;min-height:280px;background:#05070f;border:3px solid #8ca6e1;border-radius:8px;overflow:hidden;position:relative}#dos{width:100%;height:100%}#blank{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:20px;pointer-events:none;background:#060815}.hide{display:none!important}input[type=file]{position:absolute;clip:rect(0,0,0,0);width:1px;height:1px}.status{font-weight:700;color:#ffde85}.tips{font-size:14px}.warn{border-color:#c88e5a}@media(max-width:600px){main{padding:7px}.screen{min-height:230px}.panel{padding:10px}.btn,.pick{flex:1;text-align:center}.row{align-items:stretch}}
@@ -15,7 +15,12 @@ height:100vh!important;height:100dvh!important;min-height:0!important;
 max-height:none!important;aspect-ratio:auto!important;border:0!important;border-radius:0!important;
 background:#000
 }
-html.game-expanded #dos{position:absolute;inset:0;width:100%;height:100%}
+html.game-expanded #dos{position:absolute;inset:0;width:100%;height:100%;background:#000}
+html.game-expanded #dos canvas{image-rendering:pixelated}
+@media(orientation:landscape){
+html.game-expanded #exitExpanded{top:calc(5px + env(safe-area-inset-top));right:calc(5px + env(safe-area-inset-right));font-size:12px;min-height:36px;padding:5px 9px;opacity:.72}
+html.game-expanded #exitExpanded:active{opacity:1}
+}
 #exitExpanded{display:none;position:fixed;top:calc(8px + env(safe-area-inset-top));right:calc(9px + env(safe-area-inset-right));z-index:10001;background:#ffe28a;color:#15152c;border:2px solid #322545;border-radius:9px;min-height:44px;padding:8px 13px;font:800 14px system-ui;box-shadow:0 2px 8px #0009;touch-action:manipulation}
 html.game-expanded #exitExpanded{display:block}
 #rotateHint{display:none;position:fixed;bottom:calc(8px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);z-index:10000;color:#fff;background:#15152ce6;padding:7px 12px;border-radius:8px;font:600 12px system-ui;pointer-events:none;white-space:nowrap}
@@ -27,7 +32,7 @@ html.game-expanded #exitExpanded{display:block}
 <div class="panel">
 <div class="row"><label class="pick" for="bundle">📁 Choose my game bundle (.jsdos or .zip)</label><input type="file" id="bundle" ><button class="btn secondary" id="full">⛶ Fullscreen</button><button class="btn secondary" id="reset">↻ Reload</button></div>
 <p id="status" class="status" role="status">Choose the prepared .zip or .jsdos game bundle from Files to begin. Updated launcher: reads game locally and starts automatically.</p>
-<p class="muted">Your selected game stays on your device. The game is not uploaded to this website. Internet access is required to load the js-dos emulator.</p>
+<p class="muted"><b>To hide Safari’s tabs:</b> in Safari, tap Share → Add to Home Screen → Add, then open Jones from the new Home Screen icon. This is the closest iPhone/iPad equivalent to true fullscreen.</p><p class="muted">Your selected game stays on your device. The game is not uploaded to this website. Internet access is required to load the js-dos emulator.</p>
 </div>
 <button id="exitExpanded" type="button" aria-label="Exit expanded game">✕ Exit Fullscreen</button><div id="rotateHint">↻ Rotate to landscape for a larger game</div><div class="screen" id="screen"><div id="dos"></div><div id="blank"><div><div style="font-size:64px">🕹️</div><b>Original game display</b><p>Import a .jsdos bundle to play.</p></div></div></div>
 <div class="panel tips"><b>How to use</b><p>1. Download the prepared game bundle (prefer the .zip version on iPhone) and save it to Files. 2. Tap “Choose my game bundle” above and select it. If it is still greyed out, open the Files app and check the download location. Use the emulator’s on-screen mouse or touch controls; select fullscreen for more room.</p><p><b>Not a ROM download:</b> the original Sierra game files and artwork are not distributed here. For another route, <a href="https://www.scummvm.org/" target="_blank" rel="noopener">ScummVM</a> supports the game using your own game data.</p><p><a href="../">Back to earlier Life on the Block prototype</a></p></div>
@@ -53,7 +58,7 @@ say("Starting emulator. The first load may take a little longer.");
 player=window.Dos(mount,{
 initFs:bytes,
 dosboxConf:"[sdl]\nautolock=false\n[dosbox]\nmachine=svga_s3\nmemsize=16\n[cpu]\ncore=auto\ncycles=auto\n[autoexec]\n@echo off\nmount c .\nc:\nsciv256.exe -w 0 0 200 320\n",
-autoStart:true,theme:"dark",imageRendering:"pixelated",renderBackend:"canvas",renderAspect:"4/3",
+autoStart:true,theme:"dark",imageRendering:"pixelated",renderBackend:"canvas",renderAspect:"16/10",
 mouseCapture:false,softFullscreen:true,autoSave:false,scaleControls:1.25,
 onEvent:function(event,ci){
 if(event==="emu-ready")say("Emulator loaded. Launching DOS…");
