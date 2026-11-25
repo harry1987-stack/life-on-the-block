@@ -9,7 +9,7 @@
 <p>Run your own copy of the <b>original 1991 game</b> in a phone-friendly browser player. This page is an emulator launcher, not a recreated game.</p>
 <div class="panel">
 <div class="row"><label class="pick" for="bundle">📁 Choose my game bundle (.jsdos or .zip)</label><input type="file" id="bundle" ><button class="btn secondary" id="full">⛶ Fullscreen</button><button class="btn secondary" id="reset">↻ Reload</button></div>
-<p id="status" class="status" role="status">Choose the prepared .zip or .jsdos game bundle from Files to begin.</p>
+<p id="status" class="status" role="status">Choose the prepared .zip or .jsdos game bundle from Files to begin. Updated launcher: reads game locally and starts automatically.</p>
 <p class="muted">Your selected game stays on your device. The game is not uploaded to this website. Internet access is required to load the js-dos emulator.</p>
 </div>
 <div class="screen" id="screen"><div id="dos"></div><div id="blank"><div><div style="font-size:64px">🕹️</div><b>Original game display</b><p>Import a .jsdos bundle to play.</p></div></div></div>
@@ -18,20 +18,38 @@
 <script>
 (function(){
 "use strict";
-var fileInput=document.getElementById("bundle"),status=document.getElementById("status"),blank=document.getElementById("blank"),dos=document.getElementById("dos"),screen=document.getElementById("screen"),currentUrl=null,player=null;
-function say(t){status.textContent=t}
-fileInput.addEventListener("change",function(){
-var f=fileInput.files&&fileInput.files[0];if(!f)return;
-if(!/\.(jsdos|zip)$/i.test(f.name)){say("Choose the .jsdos bundle or the prepared .zip bundle, not an .exe file.");return}
-if(typeof window.Dos!=="function"){say("The emulator script did not load. Check your internet connection and refresh.");return}
-try{
-if(currentUrl)URL.revokeObjectURL(currentUrl);
-currentUrl=URL.createObjectURL(f);dos.innerHTML="";blank.classList.add("hide");
-player=window.Dos(dos,{url:currentUrl,theme:"dark",imageRendering:"pixelated",renderAspect:"4/3",mouseCapture:false,softFullscreen:true,autoSave:true,scaleControls:1.25,onEvent:function(e){if(e==="emu-ready")say("Emulator ready. Use the player controls to start.");if(e==="bnd-play")say("Game running — enjoy!")}});
-say("Loading "+f.name+"…");
-}catch(e){blank.classList.remove("hide");say("Could not open game bundle: "+(e&&e.message||String(e)))}
+const picker=document.getElementById("bundle"), status=document.getElementById("status"), blank=document.getElementById("blank"), mount=document.getElementById("dos"), screen=document.getElementById("screen");
+let player=null;
+function say(message){status.textContent=message}
+async function startGame(file){
+if(!file)return;
+if(!/\.(jsdos|zip)$/i.test(file.name)){say("Please select the prepared .zip or .jsdos bundle, not a DOS .exe.");return}
+if(typeof window.Dos!=="function"){say("The js-dos emulator failed to download. Check your connection and reload.");return}
+try {
+say("Reading "+file.name+" ("+Math.round(file.size/1024)+" KB)…");
+const bytes=new Uint8Array(await file.arrayBuffer());
+if(bytes[0]!==80 || bytes[1]!==75){say("This is not a ZIP-based game bundle. Please download the prepared ZIP again.");return}
+if(player){await player.stop();player=null}
+mount.replaceChildren();
+blank.classList.add("hide");
+say("Starting emulator. The first load may take a little longer.");
+player=window.Dos(mount,{
+initFs:bytes,
+dosboxConf:"[sdl]\nautolock=false\n[dosbox]\nmachine=svga_s3\nmemsize=16\n[cpu]\ncore=auto\ncycles=auto\n[autoexec]\n@echo off\nmount c .\nc:\nsciv256.exe -w 0 0 200 320\n",
+autoStart:true,theme:"dark",imageRendering:"pixelated",renderBackend:"canvas",renderAspect:"4/3",
+mouseCapture:false,softFullscreen:true,autoSave:false,scaleControls:1.25,
+onEvent:function(event,ci){
+if(event==="emu-ready")say("Emulator loaded. Launching DOS…");
+if(event==="bnd-play")say("Starting the original Sierra game…");
+if(event==="ci-ready")say("DOS has started. The game should now appear below.");
+}
 });
-document.getElementById("full").onclick=function(){if(player&&player.setFullScreen){player.setFullScreen(true)}else if(screen.requestFullscreen){screen.requestFullscreen().catch(function(){say("Fullscreen is unavailable here; rotate your phone to landscape.")})}else say("Rotate your phone to landscape for a larger game area.")};
-document.getElementById("reset").onclick=function(){location.reload()};
+}catch(error){blank.classList.remove("hide");say("Launch failed: "+(error&&error.message||String(error)))}
+}
+picker.addEventListener("change",()=>startGame(picker.files&&picker.files[0]));
+document.getElementById("full").onclick=()=>{if(player){player.setFullScreen(true)}else if(screen.requestFullscreen){screen.requestFullscreen().catch(()=>say("Turn your phone sideways for a larger display."))}};
+document.getElementById("reset").onclick=()=>location.reload();
+window.addEventListener("error",e=>say("Page error: "+e.message));
+window.addEventListener("unhandledrejection",e=>say("Emulator error: "+(e.reason?.message||String(e.reason))));
 })();
 </script></body></html>
