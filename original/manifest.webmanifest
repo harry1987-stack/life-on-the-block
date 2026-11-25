@@ -1,0 +1,19 @@
+{
+  "name": "Jones in the Fast Lane — Original Game Launcher",
+  "short_name": "Jones",
+  "description": "A personal launcher for your own original DOS game files.",
+  "start_url": "/life-on-the-block/original/?mode=app",
+  "scope": "/life-on-the-block/original/",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
